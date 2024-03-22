@@ -12,7 +12,7 @@ clean:
 
 
 main: main.o libcalc.a libconvert.so
-	gcc -o main -L. -lcalc -lconvert main.o
+	gcc main.o -o main -L. -lcalc -lconvert -lm
 
 
 main.o: main.c ${HEADERS}
