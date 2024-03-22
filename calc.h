@@ -1,13 +1,15 @@
 #ifndef CALC_H
 #define CALC_H
 
-double sum(double, double);
-double difference(double, double);
-double product(double, double);
-double fraction(double, double);
+#include "error_handler.h"
 
-double factorial(double);
-double square_root(double);
+double sum(double, double, Error *);
+double difference(double, double, Error *);
+double product(double, double, Error *);
+double fraction(double, double, Error *);
+
+double factorial(double, Error *);
+double square_root(double, Error *);
 
 #endif
 

@@ -1,8 +1,9 @@
 .PHONY: all clean install uninstall
 
-HEADERS = calc.h convert.h
+HEADERS = calc.h convert.h input.h error_handler.h
 CALC_OBJECTS = sum.o difference.o product.o fraction.o factorial.o square_root.o
 CONVERT_OBJECTS = upper.o lower.o
+MAIN_OBJECTS = main.o input.o error_handler.o
 CFLAGS += -Wall -Wextra -Werror
 
 all: main
@@ -21,11 +22,17 @@ uninstall:
 	rm -rf /usr/bin/main
 
 
-main: main.o libcalc.a libconvert.so
-	gcc main.o -o main -lconvert -L. -lcalc -lm
+main: ${MAIN_OBJECTS} libcalc.a libconvert.so
+	gcc ${MAIN_OBJECTS} -o main -lconvert -L. -lcalc -lm
 
 
 main.o: main.c ${HEADERS}
+	gcc ${CFLAGS} -c $<
+
+input.o: input.c ${HEADERS}
+	gcc ${CFLAGS} -c $<
+
+error_handler.o: error_handler.c ${HEADERS}
 	gcc ${CFLAGS} -c $<
 
 
