@@ -18,126 +18,93 @@ typedef struct {
     char text[BUFFER_SIZE];
 } TextInput;
 
-typedef union {
-    UnaryInput unaryInput;
-    BinaryInput binaryInput;
-    TextInput textInput;
-} Input;
-
-static void unaryInputPrompt(Input *input, Error *err) {
+static void unary_input_prompt(UnaryInput *input, Error *err) {
     printf("Enter the number: ");
-    if (scanf("%lf", &input->unaryInput.num) <= 0) {
+    if (scanf("%lf", &input->num) <= 0) {
         set_error(err, "You need to specify the number with or without floating point.");
     }
 }
 
-static void binaryInputPrompt(Input *input, Error *err) {
+static void binary_input_prompt(BinaryInput *input, Error *err) {
     printf("Enter two spaced numbers: ");
-    if (scanf("%lf %lf", &input->binaryInput.num1, &input->binaryInput.num2) <= 0) {
+    if (scanf("%lf %lf", &input->num1, &input->num2) <= 0) {
         set_error(err, "You need to specify numbers with or without floating point.");
     }
 }
 
-static void textInputPrompt(Input *input, Error *err) {
+static void text_input_prompt(TextInput *input, Error *err) {
     printf("Enter text: ");
 
     // Not the best way to read whole line but in our case can be available
-    if (scanf(" %1023[^\n]", input->textInput.text) <= 0) {
+    if (scanf(" %1023[^\n]", input->text) <= 0) {
         set_error(err, "Your text is too long or incorrect.");
     }
 }
 
-void process_input(char operation, Error *err) {
-    Input input;
+static void process_unary_input(char operation, double (*callback)(double,Error*), Error *err) {
+    UnaryInput input;
     double result;
+    unary_input_prompt(&input, err);
+    if (err->is_set) {
+        print_and_unset_error(err);
+    } else {
+        result = (*callback)(input.num, err);
+        if (err->is_set) {
+            print_and_unset_error(err);
+        } else {
+            printf("%c(%.2lf) = %.2lf\n", operation, input.num, result);
+        }
+    }
+}
+
+static void process_binary_input(char operation, double (*callback)(double,double,Error*), Error *err) {
+    BinaryInput input;
+    double result;
+    binary_input_prompt(&input, err);
+    if (err->is_set) {
+        print_and_unset_error(err);
+    } else {
+        result = (*callback)(input.num1, input.num2, err);
+        if (err->is_set) {
+            print_and_unset_error(err);
+        } else {
+            printf("%.2lf %c %.2lf = %.2lf\n", input.num1, operation, input.num2, result);
+        }
+    }
+}
+
+static void process_text_input(void (*callback)(char*,Error*), Error *err) {
+    TextInput input;
+    text_input_prompt(&input, err);
+    (*callback)(input.text, err);
+    printf("Your new string: %s\n", input.text);
+}
+
+void process_input(char operation, Error *err) {
     switch (operation) {
         case '+':
-            binaryInputPrompt(&input, err);
-            if (err->is_set) {
-                print_and_unset_error(err);
-            } else {
-                result = sum(input.binaryInput.num1, input.binaryInput.num2, err);
-                if (err->is_set) {
-                    print_and_unset_error(err);
-                } else {
-                    printf("%.2lf + %.2lf = %.2lf\n", input.binaryInput.num1, input.binaryInput.num2, result);
-                }
-            }
+            process_binary_input(operation, sum, err);
             break;
         case '-':
-            binaryInputPrompt(&input, err);
-            if (err->is_set) {
-                print_and_unset_error(err);
-            } else {
-                result = difference(input.binaryInput.num1, input.binaryInput.num2, err);
-                if (err->is_set) {
-                    print_and_unset_error(err);
-                } else {
-                    printf("%.2lf - %.2lf = %.2lf\n", input.binaryInput.num1, input.binaryInput.num2, result);
-                }
-            }
+            process_binary_input(operation, difference, err);
             break;
         case '*':
-            binaryInputPrompt(&input, err);
-            if (err->is_set) {
-                print_and_unset_error(err);
-            } else {
-                result = product(input.binaryInput.num1, input.binaryInput.num2, err);
-                if (err->is_set) {
-                    print_and_unset_error(err);
-                } else {
-                    printf("%.2lf * %.2lf = %.2lf\n", input.binaryInput.num1, input.binaryInput.num2, result);
-                }
-            }
+            process_binary_input(operation, product, err);
             break;
         case '/':
-            binaryInputPrompt(&input, err);
-            if (err->is_set) {
-                print_and_unset_error(err);
-            } else {
-                result = fraction(input.binaryInput.num1, input.binaryInput.num2, err);
-                if (err->is_set) {
-                    print_and_unset_error(err);
-                } else {
-                    printf("%.2lf / %.2lf = %.2lf\n", input.binaryInput.num1, input.binaryInput.num2, result);
-                }
-            }
+            process_binary_input(operation, fraction, err);
             break;
         case 'f':
-            unaryInputPrompt(&input, err);
-            if (err->is_set) {
-                print_and_unset_error(err);
-            } else {
-                result = factorial(input.unaryInput.num, err);
-                if (err->is_set) {
-                    print_and_unset_error(err);
-                } else {
-                    printf("factorial(%.2lf) = %.2lf\n", input.unaryInput.num, result);
-                }
-            }
+            process_unary_input(operation, factorial, err);
             break;
         case 'r':
-            unaryInputPrompt(&input, err);
-            if (err->is_set) {
-                print_and_unset_error(err);
-            } else {
-                result = square_root(input.unaryInput.num, err);
-                if (err->is_set) {
-                    print_and_unset_error(err);
-                } else {
-                    printf("square_root(%.2lf) = %.2lf\n", input.unaryInput.num, result);
-                }
-            }
+            process_unary_input(operation, square_root, err);
             break;
         case 'u':
-            textInputPrompt(&input, err);
-            upper(input.textInput.text);
-            printf("Your string in uppercase: %s\n", input.textInput.text);
+            process_text_input(upper, err);
             break;
         case 'l':
-            textInputPrompt(&input, err);
-            lower(input.textInput.text);
-            printf("Your string in lowercase: %s\n", input.textInput.text);
+            process_text_input(lower, err);
             break;
         case 'q': break;
         default:

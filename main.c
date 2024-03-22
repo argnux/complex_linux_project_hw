@@ -9,6 +9,7 @@ void flush() {
 
 int main() {
     Error error;
+    unset_error(&error);
     char operation = ' ';
     while (1) {
         printf("Choose the operation:\n");

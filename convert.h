@@ -1,8 +1,10 @@
 #ifndef CONVERT_H
 #define CONVERT_H
 
-void upper(char *text);
-void lower(char *text);
+#include "error_handler.h"
+
+void upper(char *text, Error *err);
+void lower(char *text, Error *err);
 
 #endif
 
