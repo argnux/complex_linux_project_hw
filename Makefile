@@ -1,4 +1,4 @@
-.PHONY: all clean
+.PHONY: all clean install uninstall
 
 HEADERS = calc.h convert.h
 CALC_OBJECTS = sum.o difference.o product.o fraction.o factorial.o square_root.o
@@ -10,9 +10,19 @@ all: main
 clean:
 	rm -rf main *.o *.a *.so
 
+install:
+	cp $$(pwd)/libconvert.so /usr/lib
+	cp $$(pwd)/main /usr/bin
+	chmod 0755 /usr/lib/libconvert.so
+	ldconfig
+
+uninstall:
+	rm -rf /usr/lib/libconvert.so
+	rm -rf /usr/bin/main
+
 
 main: main.o libcalc.a libconvert.so
-	gcc main.o -o main -L. -lcalc -lconvert -lm
+	gcc main.o -o main -lconvert -L. -lcalc -lm
 
 
 main.o: main.c ${HEADERS}

@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 #include "calc.h"
+#include "convert.h"
 
 #define BUFFER_SIZE 1024 // assume max buffer size is 1kB
 
@@ -35,9 +36,8 @@ void binaryInputPrompt(Input *input) {
 void textInputPrompt(Input *input) {
     printf("Enter text: ");
 
-    char *buf = input->textInput.text;
-    size_t sz = BUFFER_SIZE;
-    getline(&buf, &sz, stdin);
+    // Not the best way to read whole line but in our case can be available
+    scanf(" %1023[^\n]", input->textInput.text);
 }
 
 void process_input(char operation) {
@@ -74,8 +74,16 @@ void process_input(char operation) {
             result = square_root(input.unaryInput.num);
             printf("square_root(%.2lf) = %.2lf\n", input.unaryInput.num, result);
             break;
-        //case 'u': upper(); break;
-        //case 'l': lower(); break;
+        case 'u':
+            textInputPrompt(&input);
+            upper(input.textInput.text);
+            printf("Your string in uppercase: %s\n", input.textInput.text);
+            break;
+        case 'l':
+            textInputPrompt(&input);
+            lower(input.textInput.text);
+            printf("Your string in lowercase: %s\n", input.textInput.text);
+            break;
         case 'q': break;
         default:
             fprintf(stderr, "Unknown operation: %c.\n", operation);
@@ -93,8 +101,8 @@ int main() {
         printf("\t/\tto find the fraction of two numbers\n");
         printf("\tf\tto find the factorial of the number\n");
         printf("\tr\tto find the square root of the number\n");
-        //printf("\tu\tto translate the text to uppercase\n")
-        //printf("\tl\tto translate the text to lowercase\n");
+        printf("\tu\tto translate the text to uppercase\n");
+        printf("\tl\tto translate the text to lowercase\n");
         printf("\tq\tto quit the program\n");
 
         printf("\nYour decision: ");
