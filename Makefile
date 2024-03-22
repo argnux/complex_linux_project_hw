@@ -3,27 +3,28 @@
 HEADERS = calc.h convert.h input.h error_handler.h
 CALC_OBJECTS = sum.o difference.o product.o fraction.o factorial.o square_root.o
 CONVERT_OBJECTS = upper.o lower.o
-MAIN_OBJECTS = main.o input.o error_handler.o
+COMPLEX_LINUX_PROJECT_HW_OBJECTS = main.o input.o error_handler.o
 CFLAGS += -Wall -Wextra -Werror
+BINARY = complex_linux_project_hw
 
-all: main
+all: ${BINARY}
 
 clean:
-	rm -rf main *.o *.a *.so
+	rm -rf ${BINARY} *.o *.a *.so
 
 install:
 	cp $$(pwd)/libconvert.so /usr/lib
-	cp $$(pwd)/main /usr/bin
+	cp $$(pwd)/${BINARY} /usr/bin
 	chmod 0755 /usr/lib/libconvert.so
 	ldconfig
 
 uninstall:
 	rm -rf /usr/lib/libconvert.so
-	rm -rf /usr/bin/main
+	rm -rf /usr/bin/${BINARY}
 
 
-main: ${MAIN_OBJECTS} libcalc.a libconvert.so
-	gcc ${MAIN_OBJECTS} -o main -lconvert -L. -lcalc -lm
+${BINARY}: ${COMPLEX_LINUX_PROJECT_HW_OBJECTS} libcalc.a libconvert.so
+	gcc ${COMPLEX_LINUX_PROJECT_HW_OBJECTS} -o $@ -lconvert -L. -lcalc -lm
 
 
 main.o: main.c ${HEADERS}
